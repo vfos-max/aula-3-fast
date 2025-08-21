@@ -1,0 +1,188 @@
+{
+	"info": {
+		"_postman_id": "75186110-5803-4154-b178-dd55bc1c8ab9",
+		"name": "ServeRest",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "46362060"
+	},
+	"item": [
+		{
+			"name": "GetUsuarios",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Validar status da requisicao igual a 200\", function() {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}usuarios",
+					"host": [
+						"{{BaseUrl}}usuarios"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PostUsuario",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Verificar resposta do cadastro de usuario\", function() {\r",
+							"    const responseJson = pm.response.json();\r",
+							"\r",
+							"    pm.expect(responseJson.message).to.eql(\"Cadastro realizado com sucesso\");\r",
+							"});\r",
+							"\r",
+							"\r",
+							"let responseJson = pm.response.json();\r",
+							"\r",
+							"// Se o _id existir, vamos salvar como variavel de ambiente\r",
+							"if (responseJson._id) {\r",
+							"    pm.environment.set(\"userID\", responseJson._id);\r",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// primeiro geramos um número aleatório\r",
+							"let numeroAleatorio = Math.floor(Math.random() * 100000);\r",
+							"\r",
+							"// montamos o email\r",
+							"let email = `joao${numeroAleatorio}@fast.cesar.com`;\r",
+							"\r",
+							"// Salva o email como variável de ambiente\r",
+							"pm.environment.set(\"userEmail\", email);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"nome\": \"Joao Test\",\r\n    \"email\": \"{{userEmail}}\",\r\n    \"password\": \"joao123\",\r\n    \"administrador\": \"true\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrl}}usuarios",
+					"host": [
+						"{{BaseUrl}}usuarios"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PutAtualizaUsuario",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status da requisição é 200 OK\", function () {\r",
+							"    pm.response.to.have.status(200); \r",
+							"});\r",
+							"pm.test(\"Mensagem de sucesso ao atualizar usuário\", function () {\r",
+							"    const responseJson = pm.response.json();\r",
+							"    pm.expect(responseJson.message).to.eql(\"Registro alterado com sucesso\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"nome\": \"Joao Test Novo Novo\",\r\n    \"email\": \"joao23@fast.cesar.com\",\r\n    \"password\": \"joao123\",\r\n    \"administrador\": \"true\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrl}}usuarios/{{userID}}",
+					"host": [
+						"{{BaseUrl}}usuarios"
+					],
+					"path": [
+						"{{userID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DeleteUsuario",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status da requisição é 200 OK\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"pm.test(\"Mensagem de sucesso ao remover usuário\", function () {\r",
+							"    const responseJson = pm.response.json();\r",
+							"    pm.expect(responseJson.message).to.eql(\"Registro excluído com sucesso\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}/usuarios/{{userID}}",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"usuarios",
+						"{{userID}}"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
