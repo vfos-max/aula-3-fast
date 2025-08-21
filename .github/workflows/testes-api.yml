@@ -1,0 +1,53 @@
+# Nome do seu workflow (aparecerá na aba 'Actions' do GitHub)
+name: 'Executar Testes de API com Newman'
+
+# Define quando este workflow será executado.
+on:
+  push:
+    # branches: [ main, develop ] # Opcional: só roda se o push for para 'main' ou 'develop'
+  pull_request:
+    # branches: [ main, develop ] # Opcional: roda quando um Pull Request é aberto/atualizado
+
+# Definição dos 'jobs' (tarefas) que serão executados
+jobs:
+  rodar-testes-newman:
+    # Define o sistema operacional onde este job vai rodar
+    runs-on: 'ubuntu-latest' # Um ambiente Linux fornecido pelo GitHub Actions
+
+    steps:
+      # Passo 1: Faz o 'checkout' (baixa) do seu código do repositório
+      - name: 'Checkout do Código'
+        uses: 'actions/checkout@v4' # Uma 'action' pré-definida para baixar o repositório
+
+      # Passo 2: Configura o ambiente Node.js, necessário para o Newman
+      - name: 'Configurar Node.js'
+        uses: 'actions/setup-node@v4'
+        with:
+          node-version: '18' # Use a versão mais recente do Node.js estável (pode ser '16', '20', etc.)
+
+      # Passo 3: Instala o Newman (executor do Postman)
+      - name: 'Instalar Newman'
+        run: 'npm install -g newman'
+
+      # Passo 4 (Opcional): Instala o Newman HTML Reporter (para relatórios visuais)
+      - name: 'Instalar Newman HTML Reporter'
+        run: 'npm install -g newman-reporter-htmlextra'
+
+      # Passo 5: Executa os Testes de API do Postman com Newman
+      - name: 'Executar Testes de API'
+        run: |
+          newman run ./tests/postman/minha_colecao.json -e ./tests/postman/meu_ambiente_dev.json \
+          --reporters cli,htmlextra --reporter-htmlextra-export newman-report.html
+        # Adapte os caminhos dos arquivos JSON (.minha_colecao.json e .meu_ambiente_dev.json)
+        # para onde eles estão no seu repositório.
+        # '--reporters cli,htmlextra' exibe no terminal e gera HTML.
+        # '--reporter-htmlextra-export newman-report.html' define o nome do arquivo HTML.
+
+      # Passo 6 (Opcional): Publica o relatório HTML como um artefato do workflow
+      # Isso permite que você baixe o relatório visualmente do GitHub Actions.
+      - name: 'Publicar Relatório de Testes HTML'
+        uses: 'actions/upload-artifact@v4'
+        with:
+          name: 'Relatorio-Newman' # Nome do artefato que você verá no GitHub
+          path: 'newman-report.html' # O caminho para o relatório que foi gerado no Passo 5
+
